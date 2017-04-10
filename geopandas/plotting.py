@@ -425,7 +425,12 @@ def plot_dataframe(s, column=None, cmap=None, color=None, linewidth=1.0,
                            **color_kwds)
 
     if s[column].dtype is np.dtype('O'):
-        categorical = True
+        try:
+            values = s[column].astype(np.float)
+        except TypeError:
+            categorical = True
+    else:
+        values = s[column]
 
     # Define `values` as a Series
     if categorical:
@@ -436,7 +441,6 @@ def plot_dataframe(s, column=None, cmap=None, color=None, linewidth=1.0,
         valuemap = dict([(k, v) for (v, k) in enumerate(categories)])
         values = np.array([valuemap[k] for k in s[column]])
     else:
-        values = s[column]
         if scheme is not None:
             binning = __pysal_choro(values, scheme, k=k)
             values = np.array(binning.yb)
